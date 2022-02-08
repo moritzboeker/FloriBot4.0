@@ -1,4 +1,8 @@
 #include <switch_nav_base/switch_nav_base.h>
+// TODO:
+// - goals are still jumping further away
+// - goal success detection not perfect yet
+// - maybe use jointFront instead of nav_base for global costmap
 
 SwitchNavBase::SwitchNavBase()
 {
@@ -11,17 +15,28 @@ SwitchNavBase::SwitchNavBase(ros::NodeHandle *nh)
     // overloaded constructor
     ptr_tf_listener_ = new tf2_ros::TransformListener(tf_buffer_);
     nh_ = nh;
-    seq_ = 0;
+    seq_tf_ = 0;
+    goal_status_ = 0;
+    goal_success_ctr_ = 0;
+    backward_motion_ = false;
+    rear_goal_active_ = false;
+    front_goal_active_ = false;
+    ready_for_new_goal_ = true;
+    you_can_switch_now_ = true;
+    time_at_switch_ = ros::Time::now();
     nh->getParam("frame_id_front", frame_id_front_);
     nh->getParam("frame_id_rear", frame_id_rear_);
     nh->getParam("frame_id_output", frame_id_output_);
     nh->getParam("frame_id_map", frame_id_map_);
-    frame_id_parent_ = frame_id_front_;
-    // default pose of nav_base is identical to frame of front carriage
+    nh->getParam("wheelbase_theta_zero", wheelbase_theta_zero_);
+    double delay_switch = 0;
+    nh->getParam("delay_switch", delay_switch);
+    time_delay_switch_ = ros::Duration(delay_switch);
+    // default pose of nav_base (or named differently via frame_id_output) is identical to frame of front carriage
     tf_nav_base_default_.header.stamp = ros::Time::now();
-    tf_nav_base_default_.header.frame_id = frame_id_parent_;
+    tf_nav_base_default_.header.frame_id = frame_id_front_;
     tf_nav_base_default_.child_frame_id = frame_id_output_;
-    tf_nav_base_default_.header.seq = seq_;
+    tf_nav_base_default_.header.seq = seq_tf_;
     tf_nav_base_default_.transform.translation.x = 0.0;
     tf_nav_base_default_.transform.translation.y = 0.0;
     tf_nav_base_default_.transform.translation.z = 0.0;
@@ -42,93 +57,152 @@ SwitchNavBase::~SwitchNavBase()
 
 void SwitchNavBase::create_sub_pub_()
 {   
-    // setup /cmd_vel subscriber and timer calling a callback at 20 Hz
     cmd_vel_subscriber_ = nh_->subscribe("/cmd_vel", 1, &SwitchNavBase::cmd_vel_callback_, this);
     body_angle_subscriber_ = nh_->subscribe("/sensors/bodyAngle", 1, &SwitchNavBase::body_angle_callback_, this);
-    // tf_timer_ = nh_->createTimer(ros::Duration(0.05), &SwitchNavBase::tf_callback, this);
+    goal_status_subscriber_ = nh_->subscribe("/move_base/status", 1, &SwitchNavBase::goal_status_callback_, this);
+    global_goal_subscriber_ = nh_->subscribe("/move_base_simple/goal", 1, &SwitchNavBase::global_goal_callback_, this);
+    global_goal_publisher_ = nh_->advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1, true);
+}
+
+void SwitchNavBase::goal_status_callback_(const actionlib_msgs::GoalStatusArray::ConstPtr &msg)
+{
+    if (!msg->status_list.empty())
+    {
+        // check if front carriage successfully has reached the front goal
+        // ignore rear carriage reaching rear goal
+        goal_status_ = msg->status_list[0].status;
+        goal_success_now_ = goal_status_ == actionlib_msgs::GoalStatus::SUCCEEDED;
+        if (goal_success_now_ && front_goal_active_)
+        {
+            goal_success_ctr_++;
+            ROS_INFO("Counted goal in row: %d", goal_success_ctr_);
+        }
+        else
+        {
+            goal_success_ctr_ = 0;
+        }
+
+        // only if the goal status SUCCEEDED persists for n times in a row, accept goal success
+        bool goal_success_accepted_ = goal_success_ctr_ >= 10;   
+        if (!ready_for_new_goal_ && goal_success_accepted_)
+        {
+            goal_success_ctr_ = 0;
+            ready_for_new_goal_ = true;
+        }
+    }
 }
 
 void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
 {
-    // assign translational speed of robot to variable
-    linear_speed_ = msg->linear.x;
+    // determine if robot moves for- or backwards
+    backward_motion_ = msg->linear.x < 0.0;
+    // may the robot switch between front and rear goal or between front and rear frame?
+    you_can_switch_now_ = ros::Time::now() - time_at_switch_ >= time_delay_switch_;
+    // if robot is driving backwards
+    if (backward_motion_)
+    {
+        if (rear_goal_active_)
+        {
+            // determine pose of rear frame
+            bool exception_caught = true;
+            try
+            {
+                tf_rear2front_ = tf_buffer_.lookupTransform(frame_id_front_, frame_id_rear_, ros::Time(0));
+                exception_caught = false;
+            }
+            catch (tf2::TransformException &ex)
+            {
+                ROS_WARN("%s", ex.what());
+                ros::Duration(0.1).sleep();
+            }
+            
+            // set nav_base to rear frame
+            if (!exception_caught)
+            {
+                tf_nav_base_ = tf_rear2front_;
+            }
+        }
+        else
+        {
+            if (you_can_switch_now_)
+            {
+                global_goal_pose_rear_.header.frame_id = frame_id_map_;
+                global_goal_pose_rear_.header.stamp = ros::Time::now();
+                global_goal_publisher_.publish(global_goal_pose_rear_);
+                rear_goal_active_ = true;
+                front_goal_active_ = false;            
+                time_at_switch_ = ros::Time::now();
+            }
+        }
+    }
+    // if robot is driving forwards
+    else
+    {
+        if (front_goal_active_)
+        {                   
+            // set nav_base to front frame
+            tf_nav_base_ = tf_nav_base_default_;
+        }
+        else
+        {    
+            if (you_can_switch_now_)
+            {
+                global_goal_pose_front_.header.frame_id = frame_id_map_;
+                global_goal_pose_front_.header.stamp = ros::Time::now();
+                global_goal_publisher_.publish(global_goal_pose_front_);
+                front_goal_active_ = true;
+                rear_goal_active_ = false;
+                time_at_switch_ = ros::Time::now();
+            } 
+        }
+    }
 }
 
-void SwitchNavBase::body_angle_callback_(const base::Angle::ConstPtr& msg)
+
+void SwitchNavBase::body_angle_callback_(const base::Angle::ConstPtr &msg)
 {
-    bool backward_motion = linear_speed_ < 0.0;
-    // reset nav_base from to be identical to frame of front carriage
-    tf_nav_base_ = tf_nav_base_default_;
-    if (backward_motion)
-    {
-        ROS_INFO("nav_base switched");
-        tf2::Quaternion q_rear_wrt_front;
-        float yaw = 0.0;
-        float pitch = 0.0;
-        float roll = msg->angle;
-        q_rear_wrt_front.setEuler(yaw, pitch, roll);
-        tf_nav_base_.transform.rotation.x = q_rear_wrt_front[0];
-        tf_nav_base_.transform.rotation.y = q_rear_wrt_front[1];
-        tf_nav_base_.transform.rotation.z = q_rear_wrt_front[2];
-        tf_nav_base_.transform.rotation.w = q_rear_wrt_front[3];
-        // tf2::convert(q_rear_wrt_front, tf_nav_base_.transform.rotation);
-    }
-    // update header information of nav_base frame
+    // The topic /sensors/bodyAngle is only subscribed in order to broadcast
+    // the transform with the same rate used within the simulation/ real robot.
+    // This reduces error messages like: 
+    // "TF_REPEATED_DATA ignoring data with redundant timestamp for frame ..."
+
+    // update header information of nav_base frame w.r.t. frame of front carriage
+    tf_nav_base_.header.seq = seq_tf_++;
     tf_nav_base_.header.stamp = ros::Time::now();
-    tf_nav_base_.header.seq = seq_++;
+    tf_nav_base_.header.frame_id = frame_id_front_;
+    tf_nav_base_.child_frame_id = frame_id_output_;
     // publish nav_base frame so it can be used by the local planner
     tf_broadcaster_.sendTransform(tf_nav_base_);
 }
 
-// void SwitchNavBase::local_plan_callback_(const nav_msgs::Path::ConstPtr& msg)
-// {   
-//     // assign local goal (last pose of global path) to pose variable
-//     local_goal_pose_in_map_.pose = msg->poses.back().pose;
-// }
+void SwitchNavBase::global_goal_callback_(const geometry_msgs::PoseStamped::ConstPtr &msg)
+{
+    // only reinizialize rear and front goal if previous goal has been reached successfully
+    // otherwise the global_goal_publisher_ and global_goal_subscriber_ would trigger each other.
+    if (ready_for_new_goal_)
+    {
+        // goal for front frame
+        global_goal_pose_front_ = *msg;
 
-// void SwitchNavBase::global_goal_status_callback_(const actionlib_msgs::GoalStatusArray::ConstPtr &msg)
-// {
-//     // assign latest goal status to goal status variable
-//     global_goal_status_ = msg->status_list.back().status;
-// }
+        // goal for rear frame
+        global_goal_pose_rear_ = global_goal_pose_front_;
 
-// void SwitchNavBase::tf_callback(const ros::TimerEvent &e)
-// {
-//     bool exception_caught = true;
-//     tryactionlib_msgs
-//     {
-//         // get the transforms from both rear carriage and map to front carriage frame
-//         tf_rear2front_ = tf_buffer_.lookupTransform(frame_id_front_, frame_id_rear_, ros::Time(0));
-//         tf_map2front_ = tf_buffer_.lookupTransform(frame_id_front_, frame_id_map_, ros::Time(0));
-//         exception_caught = false;
-//     }
-//     catch (tf2::TransformException &ex)
-//     {
-//         ROS_WARN("%s", ex.what());
-//         ros::Duration(0.1).sleep();
-//     }
-//     // if transforms received without exceptions
-//     if (!exception_caught)
-//     {
-//         bool backward_motion = linear_speed_ < 0.0;
+        // retrieve yaw angle of goal pose
+        tf2::Quaternion q_rear(
+            msg->pose.orientation.x,
+            msg->pose.orientation.y,
+            msg->pose.orientation.z,
+            msg->pose.orientation.w
+        );        
+        tf2::Matrix3x3 m_rear(q_rear);
+        double roll, pitch, yaw;
+        m_rear.getRPY(roll, pitch, yaw);
 
-//         ROS_INFO("switch nav_base: %d", backward_motion);
-//         // reset nav_base from to be identical to frame of front carriage
-//         tf_nav_base_ = tf_nav_base_default_;
-//         if (backward_motion)
-//         {
-//             // replace the rotation of the nav_base frame 
-//             // (which is the same as the front carriage frame by default)
-//             // by the rotation of the rear carriage frame w.r.t front carriage frame
-//             tf_nav_base_.transform.rotation.x = tf_rear2front_.transform.rotation.x;
-//             tf_nav_base_.transform.rotation.y = tf_rear2front_.transform.rotation.y;
-//             tf_nav_base_.transform.rotation.z = tf_rear2front_.transform.rotation.z;
-//             tf_nav_base_.transform.rotation.w = tf_rear2front_.transform.rotation.w;
-//         }
-//     }
-//     // update header information of nav_base frame
-//     tf_nav_base_.header.stamp = ros::Time::now();
-//     tf_nav_base_.header.seq = seq_++;
-//     // publish nav_base frame so it can be used by the local planner
-//     tf_broadcaster_.sendTransform(tf_nav_base_);
-// }
+        // determine goal for rear frame, lying behind the front goal by the length of the wheelbase which the articulated vehicle exhibits, 
+        // when the articulation angle is zero and the x-axis of the front and rear carriage is parallel.
+        global_goal_pose_rear_.pose.position.x -= cos(yaw)*wheelbase_theta_zero_;
+        global_goal_pose_rear_.pose.position.y -= sin(yaw)*wheelbase_theta_zero_;
+        ROS_INFO("NEW GOAL SET BY USER");
+        ready_for_new_goal_ = false;
+    }
+}
