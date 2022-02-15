@@ -1,8 +1,6 @@
 #include <switch_nav_base/switch_nav_base.h>
 // TODO:
-// - goals are still jumping further away
-// - goal success detection not perfect yet
-// - maybe use jointFront instead of nav_base for global costmap
+// - use switch counter and reduce distance of rear goal
 
 SwitchNavBase::SwitchNavBase()
 {
@@ -18,11 +16,12 @@ SwitchNavBase::SwitchNavBase(ros::NodeHandle *nh)
     seq_tf_ = 0;
     goal_status_ = 0;
     goal_success_ctr_ = 0;
+    switch_ctr_ = 0;
     backward_motion_ = false;
     rear_goal_active_ = false;
-    front_goal_active_ = false;
-    ready_for_new_goal_ = true;
-    you_can_switch_now_ = true;
+    front_goal_active_ = true; // set to true since the user defines a goal for the front carriage via rviz
+    goal_in_process_ = false;
+    switch_goal_permitted = true;
     time_at_switch_ = ros::Time::now();
     nh->getParam("frame_id_front", frame_id_front_);
     nh->getParam("frame_id_rear", frame_id_rear_);
@@ -66,30 +65,136 @@ void SwitchNavBase::create_sub_pub_()
 
 void SwitchNavBase::goal_status_callback_(const actionlib_msgs::GoalStatusArray::ConstPtr &msg)
 {
-    if (!msg->status_list.empty())
+    // if there are no goals within the current goal list...
+    if (!msg->status_list.empty() && goal_in_process_)
     {
-        // check if front carriage successfully has reached the front goal
-        // ignore rear carriage reaching rear goal
-        goal_status_ = msg->status_list[0].status;
-        goal_success_now_ = goal_status_ == actionlib_msgs::GoalStatus::SUCCEEDED;
-        if (goal_success_now_ && front_goal_active_)
-        {
-            goal_success_ctr_++;
-            ROS_INFO("Counted goal in row: %d", goal_success_ctr_);
-        }
-        else
-        {
-            goal_success_ctr_ = 0;
-        }
-
-        // only if the goal status SUCCEEDED persists for n times in a row, accept goal success
-        bool goal_success_accepted_ = goal_success_ctr_ >= 10;   
-        if (!ready_for_new_goal_ && goal_success_accepted_)
-        {
-            goal_success_ctr_ = 0;
-            ready_for_new_goal_ = true;
-        }
+        // ...determine the number of goals in the goal list
+        uint8_t goals_no = msg->status_list.size();
+        // ...determine the id and status of the latest goal in the goal list
+        std::string latest_goal_id = msg->status_list[goals_no-1].goal_id.id;
+        uint8_t latest_goal_status = msg->status_list[goals_no-1].status;
+        // if the previous goal set by the user via rviz has been reached...
+        switch (latest_goal_status)
+            {
+                // in case the latest goal is...
+                case actionlib_msgs::GoalStatus::SUCCEEDED:
+                    // ...new goals are welcomed
+                    goal_in_process_ = false;
+                    break;
+                case actionlib_msgs::GoalStatus::ABORTED:
+                    // ...new goals are welcomed
+                    goal_in_process_ = false;
+                    break;
+                case actionlib_msgs::GoalStatus::LOST:
+                    // ...new goals are welcomed
+                    goal_in_process_ = false;
+                    break;
+                case actionlib_msgs::GoalStatus::PREEMPTED:
+                    // ...new goals are welcomed
+                    goal_in_process_ = false;
+                    break;
+                case actionlib_msgs::GoalStatus::REJECTED:
+                    // ...new goals are welcomed
+                    goal_in_process_ = false;
+                    break;
+                case actionlib_msgs::GoalStatus::RECALLED:
+                    // ...new goals are welcomed
+                    goal_in_process_ = false;
+                    break;
+                default:
+                    break;
+            }
     }
+    {
+        // if (ready_for_new_goal_)
+        // {   
+        // // ...determine the id and status of the latest goal in the goal list
+        // std::string latest_goal_id = msg->status_list[goals_no-1].goal_id.id;
+        // uint8_t latest_goal_status = msg->status_list[goals_no-1].status;
+        // switch (latest_goal_status)
+        // {
+        //     // in case the latest goal has been accepted by the simple action server...
+        //     case actionlib_msgs::GoalStatus::ACTIVE:
+        //         /// ...save its id and status...
+        //         active_goal_id_ = latest_goal_id;
+        //         active_goal_status_ = latest_goal_status;
+        //         // ...and do not accept any new goals
+        //         ready_for_new_goal_ = false;
+        //         ROS_INFO("###########goal_id %s",active_goal_id_.c_str());
+        //         break;
+        //     default:
+        //         break;
+        // }
+        // }
+        // // if the goal set by the user via rviz has not yet been reached yet...
+        // else
+        // {
+        // // ...go through each goal in the goal list
+        // for (int goal_idx = 0; goal_idx++; goal_idx < goals_no)
+        // {
+        //     actionlib_msgs::GoalStatus goal_status = msg->status_list[goal_idx];
+        //     // if the goal id at the current index matches the saved goal...
+        //     ROS_INFO("goal_id %s",goal_status.goal_id.id.c_str());
+        //     if (goal_status.goal_id.id == active_goal_id_)
+        //     {   
+        //         // ...determine its current status
+        //         active_goal_status_ = goal_status.status;
+        //         switch (active_goal_status_)
+        //         {
+        //         // in case the observed goal is...
+        //         case actionlib_msgs::GoalStatus::SUCCEEDED:
+        //             // ...new goals are welcomed
+        //             ready_for_new_goal_ = true;
+        //             break;
+        //         case actionlib_msgs::GoalStatus::ABORTED:
+        //             // ...new goals are welcomed
+        //             ready_for_new_goal_ = true;
+        //             break;
+        //         case actionlib_msgs::GoalStatus::LOST:
+        //             // ...new goals are welcomed
+        //             ready_for_new_goal_ = true;
+        //             break;
+        //         case actionlib_msgs::GoalStatus::PREEMPTED:
+        //             // ...new goals are welcomed
+        //             ready_for_new_goal_ = true;
+        //             break;
+        //         case actionlib_msgs::GoalStatus::REJECTED:
+        //             // ...new goals are welcomed
+        //             ready_for_new_goal_ = true;
+        //             break;
+        //         case actionlib_msgs::GoalStatus::RECALLED:
+        //             // ...new goals are welcomed
+        //             ready_for_new_goal_ = true;
+        //             break;
+        //         default:
+        //             break;
+        //         }            
+        //     }
+        // }
+        // }        
+
+        // // check if front carriage successfully has reached the front goal
+        // // ignore rear carriage reaching rear goal
+        // goal_status_ = msg->status_list[0].status;
+        // goal_success_now_ = goal_status_ == actionlib_msgs::GoalStatus::SUCCEEDED;
+        // if (goal_success_now_ && front_goal_active_)
+        // {
+        //     goal_success_ctr_++;
+        //     ROS_INFO("Counted goal in row: %d", goal_success_ctr_);
+        // }
+        // else
+        // {
+        //     goal_success_ctr_ = 0;
+        // }
+
+        // // only if the goal status SUCCEEDED persists for n times in a row, accept goal success
+        // bool goal_success_accepted_ = goal_success_ctr_ >= 10;   
+        // if (!ready_for_new_goal_ && goal_success_accepted_)
+        // {
+        //     goal_success_ctr_ = 0;
+        //     ready_for_new_goal_ = true;
+        // }
+        }
 }
 
 void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
@@ -97,7 +202,7 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
     // determine if robot moves for- or backwards
     backward_motion_ = msg->linear.x < 0.0;
     // may the robot switch between front and rear goal or between front and rear frame?
-    you_can_switch_now_ = ros::Time::now() - time_at_switch_ >= time_delay_switch_;
+    switch_goal_permitted = ros::Time::now() - time_at_switch_ >= time_delay_switch_;
     // if robot is driving backwards
     if (backward_motion_)
     {
@@ -124,7 +229,7 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
         }
         else
         {
-            if (you_can_switch_now_)
+            if (switch_goal_permitted && goal_in_process_)
             {
                 global_goal_pose_rear_.header.frame_id = frame_id_map_;
                 global_goal_pose_rear_.header.stamp = ros::Time::now();
@@ -132,6 +237,7 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
                 rear_goal_active_ = true;
                 front_goal_active_ = false;            
                 time_at_switch_ = ros::Time::now();
+                switch_ctr_++;
             }
         }
     }
@@ -145,7 +251,7 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
         }
         else
         {    
-            if (you_can_switch_now_)
+            if (switch_goal_permitted && goal_in_process_)
             {
                 global_goal_pose_front_.header.frame_id = frame_id_map_;
                 global_goal_pose_front_.header.stamp = ros::Time::now();
@@ -153,6 +259,7 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
                 front_goal_active_ = true;
                 rear_goal_active_ = false;
                 time_at_switch_ = ros::Time::now();
+                switch_ctr_++;
             } 
         }
     }
@@ -179,7 +286,7 @@ void SwitchNavBase::global_goal_callback_(const geometry_msgs::PoseStamped::Cons
 {
     // only reinizialize rear and front goal if previous goal has been reached successfully
     // otherwise the global_goal_publisher_ and global_goal_subscriber_ would trigger each other.
-    if (ready_for_new_goal_)
+    if (!goal_in_process_)
     {
         // goal for front frame
         global_goal_pose_front_ = *msg;
@@ -203,6 +310,7 @@ void SwitchNavBase::global_goal_callback_(const geometry_msgs::PoseStamped::Cons
         global_goal_pose_rear_.pose.position.x -= cos(yaw)*wheelbase_theta_zero_;
         global_goal_pose_rear_.pose.position.y -= sin(yaw)*wheelbase_theta_zero_;
         ROS_INFO("NEW GOAL SET BY USER");
-        ready_for_new_goal_ = false;
+        goal_in_process_ = true;
+        switch_ctr_ = 0;
     }
 }
