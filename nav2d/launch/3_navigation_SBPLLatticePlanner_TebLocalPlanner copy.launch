@@ -30,10 +30,20 @@
 		<rosparam file="$(find nav2d)/param/global_lattice_planner_params.yaml" command="load" />
 	</node>
 
-	<!--Running dynamic footprint node-->
+	<!--Run dynamic_footprint node-->
 	<include file="$(find dynamic_footprint)/launch/dynamic_footprint.launch"/>
 		<param name="rate" value="10.0"/>
-		<param name="footprint_padding" value="0.1"/>
+		<param name="footprint_padding" value="0.0"/>
+
+	<!--Run switch_nav_base node-->
+	<include file="$(find switch_nav_base)/launch/switch_nav_base_node.launch">
+		<arg name="frame_id_front" 			default="axesFront"/>
+		<arg name="frame_id_rear" 			default="axesRear"/>
+		<arg name="frame_id_output" 		default="nav_base"/>
+		<arg name="frame_id_map" 			default="map"/>
+		<arg name="wheelbase_theta_zero" 	default="0.766"/>
+		<arg name="delay_switch" 			default="3.0"/>
+	</include>
 
 	<!-- Run rviz -->
 	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find nav2d)/rviz_cfg/navigation_teb.rviz" />

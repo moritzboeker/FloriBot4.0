@@ -3,7 +3,7 @@
     <arg name="frame_id_rear" default="axesRear"/>
     <arg name="frame_id_output" default="nav_base"/>
     <arg name="frame_id_map" default="map"/>
-    <arg name="wheelbase_theta_zero" default="1.5"/>
+    <arg name="wheelbase_theta_zero" default="0.766"/>
     <arg name="delay_switch" default="3.0"/>
 
     <node name="switch_nav_base_node" pkg="switch_nav_base" type="switch_nav_base_node" output="screen">

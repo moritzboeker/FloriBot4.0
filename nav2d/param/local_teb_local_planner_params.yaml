@@ -25,11 +25,11 @@ TebLocalPlannerROS:
  via_points_ordered: False # If true, the planner adheres to the order of via-points in the storage container
  
  # Robot         
- max_vel_x: 1.0 # Maximum translational velocity of the robot
+ max_vel_x: 0.5 # Maximum translational velocity of the robot
  max_vel_x_backwards: 0.5 # Maximum translational velocity of the robot for driving backwards
  max_vel_theta: 0.5 # Maximum angular velocity of the robot
  acc_lim_x: 0.5 # Maximum translational acceleration of the robot
- acc_lim_theta: 0.25 # Maximum angular acceleration of the robot
+ acc_lim_theta: 0.5 # Maximum angular acceleration of the robot
  is_footprint_dynamic: True # If true, updated the footprint before checking trajectory feasibility
  use_proportional_saturation: True # If true, reduce all twists components (linear x and y, and angular z) proportionally if any exceed its corresponding bounds, instead of saturating each one individually
  transform_tolerance: 0.5 # Tolerance when querying the TF Tree for a transformation (seconds)
@@ -90,10 +90,10 @@ TebLocalPlannerROS:
  penalty_epsilon: 0.1 # Add a small safty margin to penalty functions for hard-constraint approximations
  weight_max_vel_x: 2 # Optimization weight for satisfying the maximum allowed translational velocity
  weight_max_vel_y: 0 # Optimization weight for satisfying the maximum allowed strafing velocity (in use only for holonomic robots)
- weight_max_vel_theta: 1 # Optimization weight for satisfying the maximum allowed angular velocity
+ weight_max_vel_theta: 2 # Optimization weight for satisfying the maximum allowed angular velocity
  weight_acc_lim_x: 2 # Optimization weight for satisfying the maximum allowed translational acceleration
  weight_acc_lim_y: 0 # Optimization weight for satisfying the maximum allowed strafing acceleration (in use only for holonomic robots)
- weight_acc_lim_theta: 1 # Optimization weight for satisfying the maximum allowed angular acceleration
+ weight_acc_lim_theta: 2 # Optimization weight for satisfying the maximum allowed angular acceleration
  weight_kinematics_nh: 1000 # Optimization weight for satisfying the non-holonomic kinematics
  weight_kinematics_forward_drive: 0 # (ignored, if min_turning_radius!=0) Optimization weight for forcing the robot to choose only forward directions (positive transl. velocities, only diffdrive robot)
  weight_kinematics_turning_radius: 1 # Optimization weight for enforcing a minimum turning radius (carlike robots)

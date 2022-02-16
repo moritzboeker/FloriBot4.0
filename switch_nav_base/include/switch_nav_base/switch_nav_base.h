@@ -32,13 +32,12 @@ class SwitchNavBase
         uint32_t seq_tf_;
         uint8_t goal_status_;
         uint8_t goal_success_ctr_;
-        uint8_t switch_ctr_;
         
         bool backward_motion_;
-        bool rear_goal_active_;
-        bool front_goal_active_;
-        bool goal_in_process_;
-        bool switch_goal_permitted;
+        bool rear_sub_goal_active_;
+        bool front_sub_goal_active_;
+        bool main_goal_reached_;
+        bool switch_sub_goal_permitted;
         bool goal_success_now_;
         double wheelbase_theta_zero_;
         std::string frame_id_front_;
@@ -49,7 +48,7 @@ class SwitchNavBase
         uint8_t active_goal_status_;
         ros::NodeHandle* nh_;
         ros::Timer tf_timer_;
-        ros::Time time_at_switch_;
+        ros::Time time_at_switch_sub_goal_;
         ros::Duration time_delay_switch_;
         ros::Subscriber cmd_vel_subscriber_;
         ros::Subscriber body_angle_subscriber_;
