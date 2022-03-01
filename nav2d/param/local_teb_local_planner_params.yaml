@@ -45,7 +45,7 @@ TebLocalPlannerROS:
    vertices: [[-1.2, 0.25], [0.5, 0.25], [0.5, -0.25], [-1.2, -0.25]] # for type "polygon"
 
  # Robot/Car-like
- min_turning_radius: 0.5 # Minimum turning radius of a carlike robot, for the Floribot4.0 actually 0.383 (diff-drive robot: zero)
+ min_turning_radius: 0.383 # Minimum turning radius of a carlike robot, for the Floribot4.0 actually 0.383 (diff-drive robot: zero)
  wheelbase: 0.766 # The distance between the drive shaft and steering axle (only required for a carlike robot with 'cmd_angle_instead_rotvel' enabled); The value might be negative for back-wheeled robots!
  cmd_angle_instead_rotvel: False # Substitute the rotational velocity in the commanded velocity message by the corresponding steering angle (check 'axles_distance')
  
@@ -58,13 +58,13 @@ TebLocalPlannerROS:
  xy_goal_tolerance: 0.2 # Allowed final euclidean distance to the goal position
  yaw_goal_tolerance: 0.1 # Allowed final orientation error to the goal orientation
  free_goal_vel: False # Allow the robot's velocity to be nonzero for planning purposes (the robot can arrive at the goal with max speed)
- trans_stopped_vel: 0.1 # Below what maximum velocity consider we consider the robot to be stopped in translation
- theta_stopped_vel: 0.1 # Below what maximum rotation velocity we consider the robot to be stopped in rotation
+ trans_stopped_vel: 0.05 # Below what maximum velocity consider we consider the robot to be stopped in translation
+ theta_stopped_vel: 0.05 # Below what maximum rotation velocity we consider the robot to be stopped in rotation
     
  # Obstacles    
- min_obstacle_dist: 0.3 # Minimum desired separation from obstacles
- inflation_dist: 0.45 # Buffer zone around obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
- dynamic_obstacle_inflation_dist: 0.8 # Buffer zone around predicted locations of dynamic obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
+ min_obstacle_dist: 0.1 # Minimum desired separation from obstacles
+ inflation_dist: 0.2 # Buffer zone around obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
+ dynamic_obstacle_inflation_dist: 0.4 # Buffer zone around predicted locations of dynamic obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
  include_dynamic_obstacles: False # Specify whether the movement of dynamic obstacles should be predicted by a constant velocity model (this also changes the homotopy class search). If false, all obstacles are considered to be static.
  include_costmap_obstacles: True # Specify whether the obstacles in the costmap should be taken into account directly (this is necessary if no seperate clustering and detection is implemented)
  legacy_obstacle_association: False # If true, the old association strategy is used (for each obstacle, find the nearest TEB pose), otherwise the new one (for each teb pose, find only 'relevant' obstacles).
@@ -79,7 +79,7 @@ TebLocalPlannerROS:
  # Obstacles/Velocity Ratio Parameters
  obstacle_proximity_ratio_max_vel: 0.75 # Ratio of the maximum velocities used as an upper bound when reducing the speed due to the proximity to static obstacles
  obstacle_proximity_lower_bound: 0.0 # Distance to a static obstacle for which the velocity should be lower
- obstacle_proximity_upper_bound: 0.5 # Distance to a static obstacle for which the velocity should be higher
+ obstacle_proximity_upper_bound: 0.0 # Distance to a static obstacle for which the velocity should be higher
 
 
  # Optimization    
@@ -99,14 +99,14 @@ TebLocalPlannerROS:
  weight_kinematics_turning_radius: 1 # Optimization weight for enforcing a minimum turning radius (carlike robots)
  weight_optimaltime: 1 # Optimization weight for contracting the trajectory w.r.t. transition time
  weight_shortest_path: 0 # Optimization weight for contracting the trajectory w.r.t. path length
- weight_obstacle: 100 # Optimization weight for satisfying a minimum seperation from obstacles
+ weight_obstacle: 2 # Optimization weight for satisfying a minimum seperation from obstacles
  weight_inflation: 0.2 # Optimization weight for the inflation penalty (should be small)
  weight_dynamic_obstacle: 0 # Optimization weight for satisfying a minimum seperation from dynamic obstacles
  weight_dynamic_obstacle_inflation: 0 # Optimization weight for the inflation penalty of dynamic obstacles (should be small)
  weight_velocity_obstacle_ratio: 0 # Optimization weight for satisfying a maximum allowed velocity with respect to the distance to a static obstacle
  weight_viapoint: 0 # Optimization weight for minimizing the distance to via-points
  weight_adapt_factor: 2 # Some special weights (currently 'weight_obstacle') are repeatedly scaled by this factor in each outer TEB iteration (weight_new: weight_old * factor); Increasing weights iteratively instead of setting a huge value a-priori leads to better numerical conditions of the underlying optimization problem.
- obstacle_cost_exponent: 4 # Exponent for nonlinear obstacle cost (cost = linear_cost * obstacle_cost_exponent). Set to 1 to disable nonlinear cost (default)
+ obstacle_cost_exponent: 1 # Exponent for nonlinear obstacle cost (cost = linear_cost * obstacle_cost_exponent). Set to 1 to disable nonlinear cost (default)
  
  # Homotopy Class Planner
  enable_homotopy_class_planning: True
