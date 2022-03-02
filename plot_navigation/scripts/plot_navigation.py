@@ -9,7 +9,7 @@ from nav_msgs.msg import Path
 from geometry_msgs.msg import PoseStamped
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+from matplotlib.patches import Circle
 from tf.transformations import euler_from_quaternion
 
 class PlotNavigation():
@@ -20,8 +20,10 @@ class PlotNavigation():
         self.robot_front_frame = rospy.get_param("~robot_front_frame")
         self.robot_rear_frame = rospy.get_param("~robot_rear_frame")
         self.ref_frame = rospy.get_param("~reference_frame")
-        self.w_plt = 0.5
-        self.h_plt = 0.25
+        self.plot_title = rospy.get_param("~plot_title")
+        self.global_planner = rospy.get_param("/move_base/base_global_planner")
+        self.local_planner = rospy.get_param("/move_base/base_local_planner")
+        self.xy_goal_tol = rospy.get_param("~xy_goal_tolererance")
         self.global_path_x = []
         self.global_path_y = []
         self.robot_front_x = []
@@ -37,11 +39,6 @@ class PlotNavigation():
 
         self.filepath = __file__.split(sep='.')[0]+".png"
         self.fig, self.ax = plt.subplots(nrows=1, ncols=1)
-        self.ax.set_title('Global and actual path between start and goal')
-        self.ax.set_xlabel('position x (m)')
-        self.ax.set_ylabel('position y (m)')
-        self.ax.set_aspect('equal')
-
         rospy.on_shutdown(self.save_plot)
 
     def global_path_cb(self, global_path):
@@ -74,7 +71,7 @@ class PlotNavigation():
         rate = rospy.Rate(self.node_rate)
         while not rospy.is_shutdown():
             self.ax.plot(self.global_path_x, self.global_path_y, '-b', label="initial global path", linewidth=1)
-            self.ax.plot(self.robot_front_x, self.robot_front_y, '-c', label='actual front position', linewidth=1)
+            self.ax.plot(self.robot_front_x, self.robot_front_y, '--c', label='actual front position', linewidth=1)
             self.ax.plot(self.robot_rear_x, self.robot_rear_y, ':c', label='actual rear position', linewidth=1)
             plt.draw()
             plt.pause(0.05)
@@ -83,20 +80,25 @@ class PlotNavigation():
     def save_plot(self):
         self.ax.clear()
         self.ax.plot(self.global_path_x, self.global_path_y, '-b', label="initial global path", linewidth=1)
-        self.ax.plot(self.robot_front_x, self.robot_front_y, '-c', label='front carriage', linewidth=1)  
+        self.ax.plot(self.robot_front_x, self.robot_front_y, '--c', label='front carriage', linewidth=1)  
         self.ax.plot(self.robot_rear_x, self.robot_rear_y, ':c', label='rear carriage', linewidth=1)
-        self.ax.plot(self.global_path_x[0], self.global_path_y[0], 'om', markersize=3, label="front start", linewidth=1)
-        self.ax.plot(self.global_path_x[-1], self.global_path_y[-1], 'og', markersize=3, label="front goal", linewidth=1)
+        self.ax.plot(self.global_path_x[0], self.global_path_y[0], 'or', markersize=3, label="start (front carriage)", linewidth=1)
+        self.ax.plot(self.global_path_x[-1], self.global_path_y[-1], 'xg', markersize=3, label="goal (front carriage)", linewidth=1)
         pose_start_f = [self.robot_front_x[0], self.robot_front_y[0], math.cos(self.robot_front_yaw[0]), math.sin(self.robot_front_yaw[0])] 
         pose_start_r = [self.robot_rear_x[0], self.robot_rear_y[0], math.cos(self.robot_rear_yaw[0]), math.sin(self.robot_rear_yaw[0])] 
         pose_end_f = [self.robot_front_x[-1], self.robot_front_y[-1], math.cos(self.robot_front_yaw[-1]), math.sin(self.robot_front_yaw[-1])] 
         pose_end_r = [self.robot_rear_x[-1], self.robot_rear_y[-1], math.cos(self.robot_rear_yaw[-1]), math.sin(self.robot_rear_yaw[-1])] 
-        q_start = self.ax.quiver(pose_start_f[0], pose_start_f[1], pose_start_f[2], pose_start_f[3], width=0.003, headwidth=6, color='magenta')
-        self.ax.quiver(pose_start_r[0], pose_start_r[1], pose_start_r[2], pose_start_r[3], width=0.003, headwidth=6, color='magenta')
-        q_end = self.ax.quiver(pose_end_f[0], pose_end_f[1], pose_end_f[2], pose_end_f[3], width=0.003, headwidth=6, color='green')
-        self.ax.quiver(pose_end_r[0], pose_end_r[1], pose_end_r[2], pose_end_r[3], width=0.003, headwidth=6, color='green')
-        # self.ax.quiverkey(q_start, 0.8, 0.2, 1, 'start', labelpos='E')
-        # self.ax.quiverkey(q_end, 0.8, 0.1, 1, 'end', labelpos='E')      
+        self.ax.quiver(pose_start_f[0], pose_start_f[1], pose_start_f[2], pose_start_f[3], width=0.003, headwidth=6, color='r')
+        self.ax.quiver(pose_start_r[0], pose_start_r[1], pose_start_r[2], pose_start_r[3], width=0.003, headwidth=6, color='r')
+        self.ax.quiver(pose_end_f[0], pose_end_f[1], pose_end_f[2], pose_end_f[3], width=0.003, headwidth=6, color='g')
+        self.ax.quiver(pose_end_r[0], pose_end_r[1], pose_end_r[2], pose_end_r[3], width=0.003, headwidth=6, color='g')
+        self.ax.add_patch(Circle([self.global_path_x[-1], self.global_path_y[-1]], self.xy_goal_tol, fc='none', ec='g', ls='--', label="goal tolerance"))
+        self.ax.set_title('Scenario: ' + self.plot_title + ',\nGP:' + self.global_planner + ',\nLP: ' + self.local_planner, loc='left')
+        self.ax.set_xlabel('position x (m)')
+        self.ax.set_ylabel('position y (m)')
+        # self.ax.set_xlim([-1.0, 5.0])
+        # self.ax.set_ylim([-0.25, 0.25])
+        #self.ax.set_aspect('equal')      
         self.ax.legend(loc='best')
         plt.savefig(self.filepath,dpi=(300), bbox_inches='tight')
         rospy.loginfo("saved figure as "+self.filepath)
