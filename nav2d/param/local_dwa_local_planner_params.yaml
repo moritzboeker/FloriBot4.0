@@ -32,8 +32,8 @@ DWAPlannerROS:
     occdist_scale: 0.01 # (double, default: 0.01) The weight for how much the robot should attempt to avoid obstacles: the higher the value, the more the robot is indecisive and stucks in place
     twirling_scale: 0.0 # (double, default: 0.0) The weight for penalizing any changes in robot heading
 
-    yaw_goal_tolerance: 0.10 # (double, default: 0.05) The tolerance in radians for the controller in yaw/rotation when achieving its goal 
-    xy_goal_tolerance: 0.20  # (double, default: 0.10) The tolerance in meters for the controller in the x & y distance when achieving a goal 
+    yaw_goal_tolerance: 0.05 # (double, default: 0.05) The tolerance in radians for the controller in yaw/rotation when achieving its goal 
+    xy_goal_tolerance: 0.10  # (double, default: 0.10) The tolerance in meters for the controller in the x & y distance when achieving a goal 
     latch_xy_goal_tolerance: false # (bool, default: false) If goal tolerance is latched, if the robot ever reaches the goal xy location it will simply rotate in place, even if it ends up outside the goal tolerance while it is doing so.
     
     use_dwa: true # (bool, default: true) Use dynamic window approach to constrain sampling velocities to small window.
