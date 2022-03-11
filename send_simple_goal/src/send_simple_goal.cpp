@@ -18,6 +18,7 @@ int main(int argc, char** argv){
   nh.getParam("goal_pos_y", goal_pos_y);
   nh.getParam("goal_rot_z", goal_rot_z);
   nh.getParam("ref_frame_id", ref_frame_id);
+  goal_rot_z = goal_rot_z * 3.1415 / 180.0;
 
   //tell the action client that we want to spin a thread by default
   MoveBaseClient ac("move_base", true);

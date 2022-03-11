@@ -9,10 +9,10 @@ TebLocalPlannerROS:
  dt_hysteresis: 0.1 # Hysteresis that is utilized for automatic resizing depending on the current temporal resolution (dt): usually 10% of dt_ref
  global_plan_overwrite_orientation: True # Some global planners are not considering the orientation at local subgoals between start and global goal, therefore determine it automatically
  allow_init_with_backwards_motion: True # If true, the underlying trajectories might be initialized with backwards motions in case the goal is behind the start within the local costmap (this is only recommended if the robot is equipped with rear sensors)
- max_global_plan_lookahead_dist: 5.0 # Specify maximum length (cumulative Euclidean distances) of the subset of the global plan taken into account for optimization [if 0 or negative: disabled; the length is also bounded by the local costmap size]
+ max_global_plan_lookahead_dist: 3.0 # Specify maximum length (cumulative Euclidean distances) of the subset of the global plan taken into account for optimization [if 0 or negative: disabled; the length is also bounded by the local costmap size]
  force_reinit_new_goal_dist: 1.0 # Force the planner to reinitialize the trajectory if a previous goal is updated with a seperation of more than the specified value in meters (skip hot-starting)
  force_reinit_new_goal_angular: 0.78 # Force the planner to reinitialize the trajectory if a previous goal is updated with a rotational difference of more than the specified value in radians (skip hot-starting)
- feasibility_check_no_poses: 2 # Specify up to which pose (under the feasibility_check_lookahead_distance) on the predicted plan the feasibility should be checked each sampling interval; if -1, all poses up to feasibility_check_lookahead_distance are checked.
+ feasibility_check_no_poses: 3 # Specify up to which pose (under the feasibility_check_lookahead_distance) on the predicted plan the feasibility should be checked each sampling interval; if -1, all poses up to feasibility_check_lookahead_distance are checked.
  feasibility_check_lookahead_distance: -1 # Specify up to which distance (and with an index below feasibility_check_no_poses) from the robot the feasibility should be checked each sampling interval; if -1, all poses up to feasibility_check_no_poses are checked.
  exact_arc_length: False # If true, the planner uses the exact arc length in velocity, acceleration and turning rate computations [-> increased cpu time], otherwise the euclidean approximation is used.
  publish_feedback: True # Publish planner feedback containing the full trajectory and a list of active obstacles (should be enabled only for evaluation or debugging purposes)
@@ -21,7 +21,7 @@ TebLocalPlannerROS:
  visualize_with_time_as_z_axis_scale: 0 # If this value is bigger than 0, the trajectory and obstacles are visualized in 3d using the time as the z-axis scaled by this value. Most useful for dynamic obstacles.
  
  # ViaPoints
- global_plan_viapoint_sep: -0.1 # Min. separation between each two consecutive via-points extracted from the global plan [if negative: disabled]
+ global_plan_viapoint_sep: 0.4 # Min. separation between each two consecutive via-points extracted from the global plan [if negative: disabled]
  via_points_ordered: False # If true, the planner adheres to the order of via-points in the storage container
  
  # Robot         
@@ -64,12 +64,12 @@ TebLocalPlannerROS:
  # Obstacles    
  min_obstacle_dist: 0.23 # Minimum desired separation from obstacles
  inflation_dist: 0.25 # Buffer zone around obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
- dynamic_obstacle_inflation_dist: 0.2 # Buffer zone around predicted locations of dynamic obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
+ dynamic_obstacle_inflation_dist: 0.3 # Buffer zone around predicted locations of dynamic obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)
  include_dynamic_obstacles: False # Specify whether the movement of dynamic obstacles should be predicted by a constant velocity model (this also changes the homotopy class search). If false, all obstacles are considered to be static.
  include_costmap_obstacles: True # Specify whether the obstacles in the costmap should be taken into account directly (this is necessary if no seperate clustering and detection is implemented)
  legacy_obstacle_association: False # If true, the old association strategy is used (for each obstacle, find the nearest TEB pose), otherwise the new one (for each teb pose, find only 'relevant' obstacles).
- obstacle_association_force_inclusion_factor: 1.5 # The non-legacy obstacle association technique tries to connect only relevant obstacles with the discretized trajectory during optimization, all obstacles within a specifed distance are forced to be included (as a multiple of min_obstacle_dist), e.g. choose 2.0 in order to consider obstacles within a radius of 2.0*min_obstacle_dist.
- obstacle_association_cutoff_factor: 2.0 # See obstacle_association_force_inclusion_factor, but beyond a multiple of [value]*min_obstacle_dist all obstacles are ignored during optimization. obstacle_association_force_inclusion_factor is processed first.
+ obstacle_association_force_inclusion_factor: 2.0 # The non-legacy obstacle association technique tries to connect only relevant obstacles with the discretized trajectory during optimization, all obstacles within a specifed distance are forced to be included (as a multiple of min_obstacle_dist), e.g. choose 2.0 in order to consider obstacles within a radius of 2.0*min_obstacle_dist.
+ obstacle_association_cutoff_factor: 3.0 # See obstacle_association_force_inclusion_factor, but beyond a multiple of [value]*min_obstacle_dist all obstacles are ignored during optimization. obstacle_association_force_inclusion_factor is processed first.
  costmap_obstacles_behind_robot_dist: 2.0 # Limit the occupied local costmap obstacles taken into account for planning behind the robot (specify distance in meters)
  obstacle_poses_affected: 5 # The obstacle position is attached to the closest pose on the trajectory to reduce computational effort, but take a number of neighbors into account as well
  costmap_converter_plugin: ""
@@ -79,7 +79,7 @@ TebLocalPlannerROS:
  # Obstacles/Velocity Ratio Parameters
  obstacle_proximity_ratio_max_vel: 1.0 # Ratio of the maximum velocities used as an upper bound when reducing the speed due to the proximity to static obstacles
  obstacle_proximity_lower_bound: 0.0 # Distance to a static obstacle for which the velocity should be lower
- obstacle_proximity_upper_bound: 0.00 # Distance to a static obstacle for which the velocity should be higher
+ obstacle_proximity_upper_bound: 0.0 # Distance to a static obstacle for which the velocity should be higher
 
 
  # Optimization    
@@ -87,24 +87,24 @@ TebLocalPlannerROS:
  no_outer_iterations: 3 # Each outerloop iteration automatically resizes the trajectory and invokes the internal optimizer with no_inner_iterations
  optimization_activate: True # Activate the optimization
  optimization_verbose: False # Print verbose information
- penalty_epsilon: 0.1 # Add a small safty margin to penalty functions for hard-constraint approximations
+ penalty_epsilon: 0.01 # Add a small safty margin to penalty functions for hard-constraint approximations
  weight_max_vel_x: 2 # Optimization weight for satisfying the maximum allowed translational velocity
  weight_max_vel_y: 0 # Optimization weight for satisfying the maximum allowed strafing velocity (in use only for holonomic robots)
- weight_max_vel_theta: 2 # Optimization weight for satisfying the maximum allowed angular velocity
- weight_acc_lim_x: 2 # Optimization weight for satisfying the maximum allowed translational acceleration
+ weight_max_vel_theta: 1 # Optimization weight for satisfying the maximum allowed angular velocity
+ weight_acc_lim_x: 1 # Optimization weight for satisfying the maximum allowed translational acceleration
  weight_acc_lim_y: 0 # Optimization weight for satisfying the maximum allowed strafing acceleration (in use only for holonomic robots)
- weight_acc_lim_theta: 2 # Optimization weight for satisfying the maximum allowed angular acceleration
+ weight_acc_lim_theta: 1 # Optimization weight for satisfying the maximum allowed angular acceleration
  weight_kinematics_nh: 1000 # Optimization weight for satisfying the non-holonomic kinematics
- weight_kinematics_forward_drive: 0 # (ignored, if min_turning_radius!=0) Optimization weight for forcing the robot to choose only forward directions (positive transl. velocities, only diffdrive robot)
+ weight_kinematics_forward_drive: 1 # (ignored, if min_turning_radius!=0) Optimization weight for forcing the robot to choose only forward directions (positive transl. velocities, only diffdrive robot)
  weight_kinematics_turning_radius: 1 # Optimization weight for enforcing a minimum turning radius (carlike robots)
  weight_optimaltime: 1 # Optimization weight for contracting the trajectory w.r.t. transition time
  weight_shortest_path: 0 # Optimization weight for contracting the trajectory w.r.t. path length
  weight_obstacle: 2 # Optimization weight for satisfying a minimum seperation from obstacles
- weight_inflation: 0.2 # Optimization weight for the inflation penalty (should be small)
+ weight_inflation: 0.05 # Optimization weight for the inflation penalty (should be small)
  weight_dynamic_obstacle: 0 # Optimization weight for satisfying a minimum seperation from dynamic obstacles
  weight_dynamic_obstacle_inflation: 0 # Optimization weight for the inflation penalty of dynamic obstacles (should be small)
  weight_velocity_obstacle_ratio: 0 # Optimization weight for satisfying a maximum allowed velocity with respect to the distance to a static obstacle
- weight_viapoint: 0 # Optimization weight for minimizing the distance to via-points
+ weight_viapoint: 2 # Optimization weight for minimizing the distance to via-points
  weight_adapt_factor: 2 # Some special weights (currently 'weight_obstacle') are repeatedly scaled by this factor in each outer TEB iteration (weight_new: weight_old * factor); Increasing weights iteratively instead of setting a huge value a-priori leads to better numerical conditions of the underlying optimization problem.
  obstacle_cost_exponent: 1 # Exponent for nonlinear obstacle cost (cost = linear_cost * obstacle_cost_exponent). Set to 1 to disable nonlinear cost (default)
  
@@ -115,7 +115,7 @@ TebLocalPlannerROS:
  max_number_plans_in_current_class: 2 # Max number of trajectories to try that are in the same homotopy class as the current best trajectory (setting this to 2 or more helps avoid local minima). Must be <= max_number_classes
  selection_cost_hysteresis: 0.9 # Specify how much trajectory cost must a new candidate have w.r.t. a previously selected trajectory in order to be selected (selection if new_cost < old_cost*factor)
  selection_prefer_initial_plan: 0.95 # Specify a cost reduction in the interval (0,1) for the trajectory in the equivalence class of the initial plan.)
- selection_obst_cost_scale: 2.0 # Extra scaling of obstacle cost terms just for selecting the 'best' candidate (new_obst_cost: obst_cost*factor)
+ selection_obst_cost_scale: 1.0 # Extra scaling of obstacle cost terms just for selecting the 'best' candidate (new_obst_cost: obst_cost*factor)
  selection_viapoint_cost_scale: 1.0 # Extra scaling of via-point cost terms just for selecting the 'best' candidate. (new_viapt_cost: viapt_cost*factor)
  selection_alternative_time_cost: False # If true, time cost is replaced by the total transition time.
  selection_dropping_probability: 0.1 # At each planning cycle, TEBs other than the current 'best' one will be randomly dropped with this probability. Prevents becoming 'fixated' on sub-optimal alternative homotopies.
@@ -127,7 +127,8 @@ TebLocalPlannerROS:
  h_signature_threshold: 0.1 # Two h-signuteres are assumed to be equal, if both the difference of real parts and complex parts are below the specified threshold
  obstacle_heading_threshold: 0.45 # Specify the value of the normalized scalar product between obstacle heading and goal heading in order to take them (obstacles) into account for exploration
  viapoints_all_candidates: True # If true, all trajectories of different topologies are attached to the set of via-points, otherwise only the trajectory sharing the same one as the initial/global plan is attached (no effect in test_optim_node).
- #max_ratio_detours_duration_best_duration: 3.0 # Detours are discarted if their execution time / the execution time of the best teb is > this. 
+ delete_detours_backwards: True
+ max_ratio_detours_duration_best_duration: 3.0 # Detours are discarted if their execution time / the execution time of the best teb is > this. 
  visualize_hc_graph: False # Visualize the graph that is created for exploring new homotopy classes
  
 
@@ -146,4 +147,6 @@ TebLocalPlannerROS:
 #  oscillation_recovery_min_duration: 10  # deprecated
 #  oscillation_filter_duration: 10        # deprecated
 #  max_samples: 500                       # deprecated
-#  simple_exploration: False              # deprecated, If true, distinctive trajectories are explored using a simple left-right approach (pass each obstacle on the left or right side) for path generation, otherwise sample possible roadmaps randomly in a specified region between start and goal. 
+#  simple_exploration: False              # deprecated If true, distinctive trajectories are explored using a simple left-right approach (pass each obstacle on the left or right side) for path generation, otherwise sample possible roadmaps randomly in a specified region between start and goal. 
+#  global_plan_prune_distance: 1          # deprecated
+#  complete_global_plan: True             # deprecated

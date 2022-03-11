@@ -129,9 +129,9 @@ class PlotNavigation():
             self.ax_plot.quiver(pose_end_f[0], pose_end_f[1], pose_end_f[2], pose_end_f[3], width=0.003, headwidth=6, color='g')
             self.ax_plot.quiver(pose_end_r[0], pose_end_r[1], pose_end_r[2], pose_end_r[3], width=0.003, headwidth=6, color='g')
             # add dummy point to create legend for robot orientation 
+            self.ax_plot.scatter([], [], c='blue', marker=u"$\u2212\!\u2192$", s=200, label='initial goal orientation')
             self.ax_plot.scatter([], [], c='red', marker=u"$\u2212\!\u2192$", s=200, label='robot start orientation')
             self.ax_plot.scatter([], [], c='green', marker=u"$\u2212\!\u2192$", s=200, label='robot stop orientation')
-            self.ax_plot.scatter([], [], c='blue', marker=u"$\u2212\!\u2192$", s=200, label='given goal orientation')
 
     def plot_obstacles(self):
         if self.map_available:
@@ -186,20 +186,22 @@ class PlotNavigation():
             plt.draw()
             plt.pause(0.5)
             rate.sleep() 
-
-    def export_legend(self, legend, filename="legend.png", expand=[-5,-5,5,5]):
-        fig  = legend.figure
-        fig.canvas.draw()
-        bbox  = legend.get_window_extent()
-        bbox = bbox.from_extents(*(bbox.extents + np.array(expand)))
-        bbox = bbox.transformed(fig.dpi_scale_trans.inverted())
-        fig.savefig(filename, dpi=300, bbox_inches=bbox)
             
     def save_plot(self):
         self.ax_plot.clear()
         self.ax_plot.autoscale(enable=False)
-        self.ax_plot.set_xlim([-1.0, 3.0])
-        self.ax_plot.set_ylim([-0.5, 0.5])            
+        # row entry
+        # self.ax_plot.set_xlim([-1.5, 2.5])
+        # self.ax_plot.set_ylim([-0.4, 0.6]) 
+        # 
+        # row exit       
+        # self.ax_plot.set_xlim([-0.5, 2.0])
+        # self.ax_plot.set_ylim([-0.5, 1.5]) 
+        # 
+        # row uturn second row
+        self.ax_plot.set_xlim([-1.5, 1.5])
+        self.ax_plot.set_ylim([-0.5, 2.0])
+
         self.plot_global_path()
         self.plot_robot_pose()
         self.plot_obstacles()   
