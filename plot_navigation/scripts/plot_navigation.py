@@ -18,7 +18,6 @@ class PlotNavigation():
         self.robot_front_frame = rospy.get_param("~robot_front_frame")
         self.robot_rear_frame = rospy.get_param("~robot_rear_frame")
         self.ref_frame = rospy.get_param("~reference_frame")
-        self.plot_title = rospy.get_param("~plot_title")
         self.global_planner = rospy.get_param("/move_base/base_global_planner")
         self.local_planner = rospy.get_param("/move_base/base_local_planner")
         # trim e.g. global_planner/GlobalPlanner to GlobalPlanner
@@ -189,7 +188,7 @@ class PlotNavigation():
             
     def save_plot(self):
         self.ax_plot.clear()
-        self.ax_plot.autoscale(enable=False)
+        # self.ax_plot.autoscale(enable=False)
         # row entry
         # self.ax_plot.set_xlim([-1.5, 2.5])
         # self.ax_plot.set_ylim([-0.4, 0.6]) 
@@ -199,15 +198,15 @@ class PlotNavigation():
         # self.ax_plot.set_ylim([-0.5, 1.5]) 
         # 
         # row uturn second row
-        self.ax_plot.set_xlim([-1.5, 1.5])
-        self.ax_plot.set_ylim([-0.5, 2.0])
+        # self.ax_plot.set_xlim([-1.5, 1.5])
+        # self.ax_plot.set_ylim([-0.5, 2.0])
 
         self.plot_global_path()
         self.plot_robot_pose()
         self.plot_obstacles()   
         self.plot_goal_deviation()          
 
-        self.ax_plot.set_title('Scenario:' + self.plot_title + ', GP:' + self.global_planner + ', LP: ' + self.local_planner, loc='left')
+        self.ax_plot.set_title('GP:' + self.global_planner + ', LP: ' + self.local_planner, loc='left')
         self.ax_plot.set_xlabel('position x (m)')
         self.ax_plot.set_ylabel('position y (m)')
         
