@@ -1,5 +1,5 @@
 resolution_m: 0.050000
-min_turning_radius_m: 0.383000
+min_turning_radius_m: 0.400000
 numberofangles: 16
 angle:0 0.00000000
 angle:1 0.46364761
@@ -75,7 +75,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 0
 endpose_c: -1 0 0
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 0.0000
@@ -84,7 +84,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 0
 endpose_c: -4 0 0
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 0.0000
@@ -99,7 +99,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 0
 endpose_c: -4 -1 1
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 0.0000
@@ -114,7 +114,7 @@ intermediateposes: 9
 primID: 7
 startangle_c: 0
 endpose_c: -4 1 -1
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 0.0000
@@ -187,7 +187,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 1
 endpose_c: -2 -1 1
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 5
 0.0000 0.0000 0.4636
@@ -198,7 +198,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 1
 endpose_c: -4 -2 1
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 0.4636
@@ -213,7 +213,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 1
 endpose_c: -4 -3 2
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 0.4636
@@ -230,7 +230,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 1
 endpose_c: -4 -1 0
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 0.4636
@@ -303,7 +303,7 @@ intermediateposes: 11
 primID: 4
 startangle_c: 2
 endpose_c: -1 -1 2
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 0.7854
@@ -312,7 +312,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 2
 endpose_c: -4 -4 2
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 12
 0.0000 0.0000 0.7854
@@ -330,7 +330,7 @@ intermediateposes: 12
 primID: 6
 startangle_c: 2
 endpose_c: -3 -4 3
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 0.7854
@@ -347,7 +347,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 2
 endpose_c: -4 -3 1
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 0.7854
@@ -422,7 +422,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 3
 endpose_c: -1 -2 3
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 5
 0.0000 0.0000 1.1071
@@ -433,7 +433,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 3
 endpose_c: -2 -4 3
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 9
 0.0000 0.0000 1.1071
@@ -448,7 +448,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 3
 endpose_c: -3 -4 2
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 1.1071
@@ -465,7 +465,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 3
 endpose_c: -1 -4 4
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 1.1071
@@ -534,7 +534,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 4
 endpose_c: 0 -1 4
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 1.5708
@@ -543,7 +543,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 4
 endpose_c: 0 -4 4
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 1.5708
@@ -558,7 +558,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 4
 endpose_c: 1 -4 5
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 1.5708
@@ -573,7 +573,7 @@ intermediateposes: 9
 primID: 7
 startangle_c: 4
 endpose_c: -1 -4 3
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 1.5708
@@ -646,7 +646,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 5
 endpose_c: 1 -2 5
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 5
 0.0000 0.0000 2.0344
@@ -657,7 +657,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 5
 endpose_c: 2 -4 5
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 2.0344
@@ -672,7 +672,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 5
 endpose_c: 3 -4 6
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 2.0344
@@ -689,7 +689,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 5
 endpose_c: 1 -4 4
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 2.0344
@@ -762,7 +762,7 @@ intermediateposes: 11
 primID: 4
 startangle_c: 6
 endpose_c: 1 -1 6
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 2.3562
@@ -771,7 +771,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 6
 endpose_c: 4 -4 6
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 12
 0.0000 0.0000 2.3562
@@ -789,7 +789,7 @@ intermediateposes: 12
 primID: 6
 startangle_c: 6
 endpose_c: 4 -3 7
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 2.3562
@@ -806,7 +806,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 6
 endpose_c: 3 -4 5
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 2.3562
@@ -881,7 +881,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 7
 endpose_c: 2 -1 7
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 5
 0.0000 0.0000 2.6779
@@ -892,7 +892,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 7
 endpose_c: 4 -2 7
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 9
 0.0000 0.0000 2.6779
@@ -907,7 +907,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 7
 endpose_c: 4 -3 6
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 2.6779
@@ -924,7 +924,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 7
 endpose_c: 4 -1 8
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 2.6779
@@ -993,7 +993,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 8
 endpose_c: 1 0 8
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 3.1416
@@ -1002,7 +1002,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 8
 endpose_c: 4 0 8
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 3.1416
@@ -1017,7 +1017,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 8
 endpose_c: 4 1 9
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 3.1416
@@ -1032,7 +1032,7 @@ intermediateposes: 9
 primID: 7
 startangle_c: 8
 endpose_c: 4 -1 7
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 3.1416
@@ -1105,7 +1105,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 9
 endpose_c: 2 1 9
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 5
 0.0000 0.0000 3.6052
@@ -1116,7 +1116,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 9
 endpose_c: 4 2 9
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 3.6052
@@ -1131,7 +1131,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 9
 endpose_c: 4 3 10
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 3.6052
@@ -1148,7 +1148,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 9
 endpose_c: 4 1 8
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 3.6052
@@ -1221,7 +1221,7 @@ intermediateposes: 11
 primID: 4
 startangle_c: 10
 endpose_c: 1 1 10
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 3.9270
@@ -1230,7 +1230,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 10
 endpose_c: 4 4 10
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 12
 0.0000 0.0000 3.9270
@@ -1248,7 +1248,7 @@ intermediateposes: 12
 primID: 6
 startangle_c: 10
 endpose_c: 3 4 11
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 3.9270
@@ -1265,7 +1265,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 10
 endpose_c: 4 3 9
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 3.9270
@@ -1340,7 +1340,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 11
 endpose_c: 1 2 11
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 5
 0.0000 0.0000 4.2487
@@ -1351,7 +1351,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 11
 endpose_c: 2 4 11
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 9
 0.0000 0.0000 4.2487
@@ -1366,7 +1366,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 11
 endpose_c: 3 4 10
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 4.2487
@@ -1383,7 +1383,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 11
 endpose_c: 1 4 12
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 4.2487
@@ -1452,7 +1452,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 12
 endpose_c: 0 1 12
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 4.7124
@@ -1461,7 +1461,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 12
 endpose_c: 0 4 12
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 4.7124
@@ -1476,7 +1476,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 12
 endpose_c: -1 4 13
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 4.7124
@@ -1491,7 +1491,7 @@ intermediateposes: 9
 primID: 7
 startangle_c: 12
 endpose_c: 1 4 11
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 4.7124
@@ -1564,7 +1564,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 13
 endpose_c: -1 2 13
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 5
 0.0000 0.0000 5.1760
@@ -1575,7 +1575,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 13
 endpose_c: -2 4 13
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 9
 0.0000 0.0000 5.1760
@@ -1590,7 +1590,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 13
 endpose_c: -3 4 14
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 5.1760
@@ -1607,7 +1607,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 13
 endpose_c: -1 4 12
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.4486
 intermediateposes: 9
 0.0000 0.0000 5.1760
@@ -1680,7 +1680,7 @@ intermediateposes: 11
 primID: 4
 startangle_c: 14
 endpose_c: -1 1 14
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 3
 0.0000 0.0000 5.4978
@@ -1689,7 +1689,7 @@ intermediateposes: 3
 primID: 5
 startangle_c: 14
 endpose_c: -4 4 14
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: 0.0000
 intermediateposes: 12
 0.0000 0.0000 5.4978
@@ -1707,7 +1707,7 @@ intermediateposes: 12
 primID: 6
 startangle_c: 14
 endpose_c: -4 3 15
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.7802
 intermediateposes: 11
 0.0000 0.0000 5.4978
@@ -1724,7 +1724,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 14
 endpose_c: -3 4 13
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 5.4978
@@ -1799,7 +1799,7 @@ intermediateposes: 9
 primID: 4
 startangle_c: 15
 endpose_c: -2 1 15
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 5
 0.0000 0.0000 5.8195
@@ -1810,7 +1810,7 @@ intermediateposes: 5
 primID: 5
 startangle_c: 15
 endpose_c: -4 2 15
-additionalactioncostmult: 5
+additionalactioncostmult: 3
 turning_radius: -0.0000
 intermediateposes: 9
 0.0000 0.0000 5.8195
@@ -1825,7 +1825,7 @@ intermediateposes: 9
 primID: 6
 startangle_c: 15
 endpose_c: -4 3 14
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: 0.7802
 intermediateposes: 11
 0.0000 0.0000 5.8195
@@ -1842,7 +1842,7 @@ intermediateposes: 11
 primID: 7
 startangle_c: 15
 endpose_c: -4 1 0
-additionalactioncostmult: 6
+additionalactioncostmult: 50
 turning_radius: -0.4486
 intermediateposes: 9
 0.0000 0.0000 5.8195
