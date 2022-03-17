@@ -39,7 +39,7 @@ DWAPlannerROS:
     use_dwa: true # (bool, default: true) Use dynamic window approach to constrain sampling velocities to small window.
     controller_frequency: 10.0 # (double, default: 20.0) The frequency at which this controller will be called in Hz.
 
-    forward_point_distance: 0.325 # (double, default: 0.325) The distance from the center point of the robot to place an additional scoring point, in meters 
+    forward_point_distance: 0.2 # (double, default: 0.325) The distance from the center point of the robot to place an additional scoring point, in meters 
     stop_time_buffer: 0.2 # (double, default: 0.2) The amount of time that the robot must stop before a collision in order for a trajectory to be considered valid in seconds 
     scaling_speed: 0.25 # (double, default: 0.25) The absolute value of the velocity at which to start scaling the robot's footprint, in m/s  
     max_scaling_factor: 0.2 # (double, default: 0.2) The maximum factor to scale the robot's footprint by 
@@ -47,3 +47,7 @@ DWAPlannerROS:
     oscillation_reset_dist: 0.05 # (double, default: 0.05) The distance the robot must travel before oscillation flags are reset, in meters 
     oscillation_reset_angle: 0.2 # (double, default: 0.2) The angle the robot must turn before oscillation flags are reset, in radians
     prune_plan: true # (bool, default: true) Defines whether or not to eat up the plan as the robot moves along the path. If set to true, points will fall off the end of the plan once the robot moves 1 meter past them.
+    #not in dynamic reconfigure
+    publish_traj_pc: false # publish all possible trajectory candidates as point cloud
+    publish_cost_grid_pc: false # publish cost grid as point cloud
+
