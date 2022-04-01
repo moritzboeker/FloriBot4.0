@@ -52,13 +52,14 @@
    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<param name="base_global_planner" value="SBPLLatticePlanner" />
 		<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-	  <param name="SBPLLatticePlanner/primitive_filename" value="$(find nav2d)/matlab/mprim/floribot_minturnradius0383_highbwrdcost.mprim" />
+	  <param name="SBPLLatticePlanner/primitive_filename" value="$(find nav2d)/matlab/mprim/floribot_minturnradius04_highbwrdcost.mprim" />
 
     <rosparam file="$(find nav2d)/param/common_costmap_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find nav2d)/param/common_costmap_params.yaml" command="load" ns="local_costmap" /> 
     <rosparam file="$(find nav2d)/param/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find nav2d)/param/global_costmap_params.yaml" command="load" /> 
 		<rosparam file="$(find nav2d)/param/move_base_params.yaml" command="load" />
+		<rosparam file="$(find nav2d)/param/local_teb_costmap_converter_params.yaml" command="load" />
 		<rosparam file="$(find nav2d)/param/local_teb_local_planner_params.yaml" command="load" />
 		<rosparam file="$(find nav2d)/param/global_lattice_planner_params.yaml" command="load" />
    </node>
