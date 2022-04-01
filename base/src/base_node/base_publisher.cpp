@@ -5,7 +5,8 @@ KinematicsPublisher::KinematicsPublisher(ros::NodeHandle* pNh)
     seq_=0;
     pNh_=pNh;
     getParam();
-    // choose where the odometry frame is set to - Front or Rear
+    // initial Base (leading carriage) is set to coordinate::Front, 
+    // it is switched automatically when driving backwards/ forwards
     Drive_.setParam(AxesLength_, WheelDiameter_, kinematics::coordinate::Front);
     createPublisherSubscriber();
     CmdVelTimer_=pNh_->createTimer(ros::Duration(1.0/PubFrequency_), &KinematicsPublisher::PublishSpeed, this);

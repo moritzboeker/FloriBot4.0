@@ -66,6 +66,7 @@ kinematics::DifferentialWheelSpeed kinematics::differentialDrive::inverseKinemat
 
     WheelSpeed.rightWheel=WheelSpeed.rightWheel/wheelRadius_;
     WheelSpeed.leftWheel=WheelSpeed.leftWheel/wheelRadius_;
+
     return WheelSpeed;
 }
 

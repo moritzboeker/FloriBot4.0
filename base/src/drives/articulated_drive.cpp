@@ -31,19 +31,12 @@ kinematics::articulatedWheelSpeed kinematics::ArticulatedDrive::inverseKinematic
     tf2::Quaternion Rotation;
 
     
-    geometry_msgs::TransformStamped JointFront2axesFront, JointFront2JointRear, JointRear2AxesRear, JointRear2JointFront;
-    tf2::Vector3 OmegaJointFront, OmegaJointRear;
-    tf2::Vector3 Pos_axesFront_wrt_jointFront, Pos_axesRear_wrt_jointRear;
-    tf2::Quaternion Rot_jointRear_wrt_jointFront, Rot_jointFront_wrt_jointRear;
-
-    coordinate Base_temp;
-
-    Base_temp = (cmdVelMsg.linear.x < 0.0) ? coordinate::JointRear : coordinate::JointFront;
+    Base_= (cmdVelMsg.linear.x < 0.0) ? coordinate::Rear : coordinate::Front;
 
     //Calculate Speeds for the two differential drives regarding the base frame
     try
     {
-        switch (Base_temp)
+        switch (Base_)
         {
         //Front Speed is given
         case coordinate::Front:
@@ -86,6 +79,7 @@ kinematics::articulatedWheelSpeed kinematics::ArticulatedDrive::inverseKinematic
             //Calculate needed Speed and Omega for AxesRear, assuming that Z and Y for the Translation from the Joint to the Axes are zero
             OmegaRear.setValue(0,0,-SpeedJointRear.y()/TranslationRear.x());
             SpeedAxesRear.setValue(SpeedJointRear.x(),0,0);
+
             break;
 
         //RearSpeed is given
@@ -129,69 +123,9 @@ kinematics::articulatedWheelSpeed kinematics::ArticulatedDrive::inverseKinematic
             SpeedAxesFront.setValue(SpeedJointFront.x(),0,0);
             break;
 
-        //Front Joint Speed is given
-        case coordinate::JointFront:
-            JointFront2JointRear=TFBuffer_.lookupTransform("jointRear", "jointFront", ros::Time(0));
-            JointFront2axesFront=TFBuffer_.lookupTransform("axesFront", "jointFront", ros::Time(0));
-            JointRear2AxesRear=TFBuffer_.lookupTransform("axesRear", "jointRear", ros::Time(0));
-
-            SpeedJointFront.setValue(cmdVelMsg.linear.x,cmdVelMsg.linear.y,cmdVelMsg.linear.z);
-            OmegaJointFront.setValue(cmdVelMsg.angular.x,cmdVelMsg.angular.y,cmdVelMsg.angular.z);
-            
-            // position of axesFront w.r.t. jointFront
-            Pos_axesFront_wrt_jointFront.setValue(JointFront2axesFront.transform.translation.x, JointFront2axesFront.transform.translation.y, JointFront2axesFront.transform.translation.z);
-            // position of axesRear w.r.t. jointRear
-            Pos_axesRear_wrt_jointRear.setValue(-JointRear2AxesRear.transform.translation.x, -JointRear2AxesRear.transform.translation.y, -JointRear2AxesRear.transform.translation.z);
-            // rotation of jointRear w.r.t jointFront
-            Rot_jointRear_wrt_jointFront.setValue(JointFront2JointRear.transform.rotation.x,JointFront2JointRear.transform.rotation.y, JointFront2JointRear.transform.rotation.z, JointFront2JointRear.transform.rotation.w);           
-
-            // velocity axesFront
-            SpeedAxesFront=SpeedJointFront+OmegaJointFront.cross(Pos_axesFront_wrt_jointFront);
-            OmegaFront=OmegaJointFront;
-
-            // velocity jointRear
-            SpeedJointRear=SpeedJointFront.rotate(Rot_jointRear_wrt_jointFront.getAxis(), Rot_jointRear_wrt_jointFront.getAngle());
-
-            // velocity axesRear
-
-            //Calculate needed Speed and Omega for AxesRear, assuming that Z and Y for the Translation from the Joint to the Axes are zero
-            OmegaRear.setValue(0,0,-SpeedJointRear.y()/Pos_axesRear_wrt_jointRear.x());
-            SpeedAxesRear.setValue(SpeedJointRear.x(),0,0);
-            break;
-        
-        //Rear Joint Speed is given
-        case coordinate::JointRear:
-            JointRear2JointFront=TFBuffer_.lookupTransform("jointFront", "jointRear", ros::Time(0));
-            JointFront2axesFront=TFBuffer_.lookupTransform("axesFront", "jointFront", ros::Time(0));
-            JointRear2AxesRear=TFBuffer_.lookupTransform("axesRear", "jointRear", ros::Time(0));
-
-            SpeedJointRear.setValue(cmdVelMsg.linear.x,cmdVelMsg.linear.y,cmdVelMsg.linear.z);
-            OmegaJointRear.setValue(cmdVelMsg.angular.x,cmdVelMsg.angular.y,cmdVelMsg.angular.z);
-            
-            // position of axesFront w.r.t. jointFront
-            Pos_axesFront_wrt_jointFront.setValue(JointFront2axesFront.transform.translation.x, JointFront2axesFront.transform.translation.y, JointFront2axesFront.transform.translation.z);
-            // position of axesRear w.r.t. jointRear
-            Pos_axesRear_wrt_jointRear.setValue(-JointRear2AxesRear.transform.translation.x, -JointRear2AxesRear.transform.translation.y, -JointRear2AxesRear.transform.translation.z);
-            // rotation of jointRear w.r.t jointFront
-            Rot_jointFront_wrt_jointRear.setValue(JointRear2JointFront.transform.rotation.x,JointRear2JointFront.transform.rotation.y, JointRear2JointFront.transform.rotation.z, JointRear2JointFront.transform.rotation.w);           
-
-            // velocity axesRear
-            SpeedAxesRear=SpeedJointRear+OmegaJointRear.cross(Pos_axesRear_wrt_jointRear);
-            OmegaRear=OmegaJointRear;
-
-            // velocity jointFront
-            SpeedJointFront=SpeedJointRear.rotate(Rot_jointFront_wrt_jointRear.getAxis(), Rot_jointFront_wrt_jointRear.getAngle());
-
-            // velocity axesRear
-
-            //Calculate needed Speed and Omega for AxesRear, assuming that Z and Y for the Translation from the Joint to the Axes are zero
-            OmegaFront.setValue(0,0,-SpeedJointFront.y()/Pos_axesFront_wrt_jointFront.x());
-            SpeedAxesFront.setValue(SpeedJointFront.x(),0,0);
-            break;
-
         //Do not calculate when any other Frame is given
         default:
-            throw new std::runtime_error("Only Front, Rear, JointFront and JointRear Frames are allowed for inverse kinematics");
+            throw new std::runtime_error("Only Front and Rear Frames are allowed for inverse kinematics");
         }
     }
     catch(tf2::TransformException &e)
@@ -203,9 +137,6 @@ kinematics::articulatedWheelSpeed kinematics::ArticulatedDrive::inverseKinematic
         retVal.Rear.rightWheel=0;
         return retVal;
     }
-
-    // ROS_WARN("linear x=%f\t y=%f\t z=%f\t angular x=%f\t y=%f\t z=%f",SpeedAxesFront.x(), SpeedAxesFront.y(), SpeedAxesFront.z(),OmegaFront.x(), OmegaFront.y(), OmegaFront.z());
-    // ROS_WARN("linear x=%f\t y=%f\t z=%f\t angular x=%f\t y=%f\t z=%f",SpeedAxesRear.x(), SpeedAxesRear.y(), SpeedAxesRear.z(),OmegaRear.x(), OmegaRear.y(), OmegaRear.z());
 
     //Set Messages for further Calculation, since the toMsg returns LinkerErrors here with workaround
     FrontMsg.linear.x=SpeedAxesFront.x();
@@ -234,19 +165,29 @@ kinematics::articulatedWheelSpeed kinematics::ArticulatedDrive::inverseKinematic
 
 geometry_msgs::Pose2D kinematics::ArticulatedDrive::forwardKinematics(articulatedWheelSpeed WheelSpeed, ros::Time Timestamp)
 {   
-    switch (Base_)
-    {
-        case coordinate::Front:
-            return frontDrive_.forwardKinematics(WheelSpeed.Front, Timestamp);
-            break;
+    // Since frame base_link is fixed to frame axesFront, we always want the odometry frame to to be at axesFront,
+    // which is why it is set independent of the driving direction (see commened lines below).
+    // If the odometry frame was dependent on the frame of the current leading carriage (e.g., Front, Rear), 
+    // the odometry pose would jump between forward and backward driving (has been tested).
 
-        case coordinate::Rear:
-            return rearDrive_.forwardKinematics(WheelSpeed.Rear, Timestamp);
-            break;
+    geometry_msgs::Pose2D FrontPose=frontDrive_.forwardKinematics(WheelSpeed.Front, Timestamp);
+    //geometry_msgs::Pose2D RearPose=rearDrive_.forwardKinematics(WheelSpeed.Rear, Timestamp);
 
-        default:
-            throw new std::runtime_error("Can not calculate forward kinematics for given Frame");
-    }
+    return FrontPose;
+    
+    // switch (Base_)
+    // {
+    //     case coordinate::Front:
+    //         return FrontPose;
+    //         break;
+
+    //     case coordinate::Rear:
+    //         return RearPose;
+    //         break;
+
+    //     default:
+    //         throw new std::runtime_error("Can not calculate forward kinematics for given Frame");
+    // }
 }
 
 void kinematics::ArticulatedDrive::setParam(double AxesLength, double WheelDiameter, coordinate Base)
