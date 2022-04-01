@@ -16,6 +16,11 @@
    <arg name="goal_rot_z" default="90.0"/> -->
 
    <!-- row u turn second row -->
+   <!-- <arg name="goal_pos_x" default="-0.05"/>
+   <arg name="goal_pos_y" default="1.5"/>
+   <arg name="goal_rot_z" default="180.0"/>
+   <arg name="ref_frame_id" default="map"/> -->
+   
    <arg name="goal_pos_x" default="-0.05"/>
    <arg name="goal_pos_y" default="1.5"/>
    <arg name="goal_rot_z" default="180.0"/>
