@@ -43,8 +43,6 @@
 		<arg name="frame_id_rear" 			default="jointRear"/>
 		<arg name="frame_id_output" 		default="nav_base"/>
 		<arg name="frame_id_map" 			default="map"/>
-		<arg name="wheelbase_theta_zero" 	default="0.766"/>
-		<arg name="delay_switch" 			default="3.0"/>
 	</include>
 
 	<!-- Run rviz -->
