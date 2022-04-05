@@ -34,9 +34,9 @@
 	</node>
 
 	<!--Run dynamic_footprint node-->
-	<include file="$(find dynamic_footprint)/launch/dynamic_footprint.launch"/>
+	<!-- <include file="$(find dynamic_footprint)/launch/dynamic_footprint.launch"/>
 		<param name="rate" value="10.0"/>
-		<param name="footprint_padding" value="0.0"/>
+		<param name="footprint_padding" value="0.0"/> -->
 
 	<!--Run switch_nav_base node-->
 	<include file="$(find switch_nav_base)/launch/switch_nav_base_node.launch">
