@@ -36,6 +36,7 @@ class SwitchNavBase
         bool backward_motion_;
         bool rear_sub_goal_active_;
         bool front_sub_goal_active_;
+        bool front_rear_goal_available_;
         bool main_goal_reached_;
         bool switch_sub_goal_permitted;
         bool goal_success_now_;

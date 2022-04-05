@@ -2,6 +2,7 @@
 // TODO:
 // - use switch counter and reduce distance of rear goal
 // - kann ziel auch mit hintern erreichen
+// - Ziel muss immer noch mit rviz vorgegeben werden - send_simple_goal und switch_nav_base funktionieren immer noch nicht zusammen
 
 SwitchNavBase::SwitchNavBase()
 {
@@ -19,7 +20,8 @@ SwitchNavBase::SwitchNavBase(ros::NodeHandle *nh)
     goal_success_ctr_ = 0;
     backward_motion_ = false;
     rear_sub_goal_active_ = false;
-    front_sub_goal_active_ = true; // set to true since the user defines a goal for the front carriage via rviz
+    front_sub_goal_active_ = false; 
+    front_rear_goal_available_ = false;
     main_goal_reached_ = true;
     switch_sub_goal_permitted = true;
     time_at_switch_sub_goal_ = ros::Time::now();
@@ -96,6 +98,9 @@ void SwitchNavBase::goal_status_callback_(const actionlib_msgs::GoalStatusArray:
 
 void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
 {
+    if (!front_rear_goal_available_){
+        return;
+    }
     // May the robot switch between front and rear goal or between front and rear robot frame?
     // The coded uses a switching delay time, within a goal or frame switch is not allowed.
     switch_sub_goal_permitted = ros::Time::now() - time_at_switch_sub_goal_ >= time_delay_switch_;
@@ -106,38 +111,36 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
     // if robot is driving backwards
     if (backward_motion_)
     {
-        if (rear_sub_goal_active_)
+        // determine pose of rear frame
+        bool exception_caught = true;
+        try
         {
-            // determine pose of rear frame
-            bool exception_caught = true;
-            try
-            {
-                tf_rear2front_ = tf_buffer_.lookupTransform(frame_id_front_, frame_id_rear_, ros::Time(0));
-                exception_caught = false;
-            }
-            catch (tf2::TransformException &ex)
-            {
-                ROS_WARN("%s", ex.what());
-                ros::Duration(0.1).sleep();
-            }        
+            tf_rear2front_ = tf_buffer_.lookupTransform(frame_id_front_, frame_id_rear_, ros::Time(0));
+            exception_caught = false;
+        }
+        catch (tf2::TransformException &ex)
+        {
+            ROS_WARN("%s", ex.what());
+            ros::Duration(0.1).sleep();
+        }  
+        // if the robot is currently aiming for the rear goal
+        if (rear_sub_goal_active_ && !exception_caught)
+        {      
             // set nav_base to rear frame
-            if (!exception_caught)
-            {
-                tf_nav_base_ = tf_rear2front_;
-            }
+            tf_nav_base_ = tf_rear2front_;
         } 
-        else
+        // if the robot is allowed to switch to the rear goal
+        else if (switch_sub_goal_permitted && !main_goal_reached_)
         {
-            if (switch_sub_goal_permitted && !main_goal_reached_)
-            {
-                ROS_INFO("BACKWARDS nav_base REAR goal REAR");
-                global_goal_pose_rear_.header.frame_id = frame_id_map_;
-                global_goal_pose_rear_.header.stamp = ros::Time::now();
-                global_goal_publisher_.publish(global_goal_pose_rear_);
-                rear_sub_goal_active_ = true;
-                front_sub_goal_active_ = false;            
-                time_at_switch_sub_goal_ = ros::Time::now();
-            }
+            // set nav_base to rear frame
+            if (!exception_caught) tf_nav_base_ = tf_rear2front_;
+            // activate rear goal
+            global_goal_pose_rear_.header.frame_id = frame_id_map_;
+            global_goal_pose_rear_.header.stamp = ros::Time::now();
+            global_goal_publisher_.publish(global_goal_pose_rear_);
+            rear_sub_goal_active_ = true;
+            front_sub_goal_active_ = false;            
+            time_at_switch_sub_goal_ = ros::Time::now();
         }
     }
     // if robot is driving forwards
@@ -148,19 +151,18 @@ void SwitchNavBase::cmd_vel_callback_(const geometry_msgs::Twist::ConstPtr &msg)
             // set nav_base to front frame
             tf_nav_base_ = tf_nav_base_default_;
         }   
-        else
-        {  
-            if  (switch_sub_goal_permitted && !main_goal_reached_)
-            {
-                ROS_INFO("FORWARDS nav_base FRONT goal FRONT");
-                global_goal_pose_front_.header.frame_id = frame_id_map_;
-                global_goal_pose_front_.header.stamp = ros::Time::now();
-                global_goal_publisher_.publish(global_goal_pose_front_);
-                rear_sub_goal_active_ = false;
-                front_sub_goal_active_ = true;
-                time_at_switch_sub_goal_ = ros::Time::now();
-            } 
-        }   
+        else if  (switch_sub_goal_permitted && !main_goal_reached_)
+        {
+            // set nav_base to front frame
+            tf_nav_base_ = tf_nav_base_default_;
+            // activate front goal
+            global_goal_pose_front_.header.frame_id = frame_id_map_;
+            global_goal_pose_front_.header.stamp = ros::Time::now();
+            global_goal_publisher_.publish(global_goal_pose_front_);
+            rear_sub_goal_active_ = false;
+            front_sub_goal_active_ = true;
+            time_at_switch_sub_goal_ = ros::Time::now();
+        } 
     }
 }
 
@@ -191,7 +193,7 @@ void SwitchNavBase::global_goal_callback_(const geometry_msgs::PoseStamped::Cons
         global_goal_pose_front_ = *msg;
 
         // goal for rear frame
-        global_goal_pose_rear_ = global_goal_pose_front_;
+        global_goal_pose_rear_ = *msg;
 
         // retrieve yaw angle of goal pose
         tf2::Quaternion q_rear(
@@ -209,6 +211,7 @@ void SwitchNavBase::global_goal_callback_(const geometry_msgs::PoseStamped::Cons
         global_goal_pose_rear_.pose.position.x -= cos(yaw)*wheelbase_theta_zero_;
         global_goal_pose_rear_.pose.position.y -= sin(yaw)*wheelbase_theta_zero_;
         ROS_INFO("NEW GOAL SET BY USER");
+        front_rear_goal_available_ = true;
         main_goal_reached_ = false; 
         time_at_switch_sub_goal_ = ros::Time::now();
     }
