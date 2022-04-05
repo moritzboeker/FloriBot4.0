@@ -21,7 +21,7 @@
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 		<param name="base_global_planner" value="SBPLLatticePlanner" />
 		<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-	  	<param name="SBPLLatticePlanner/primitive_filename" value="$(find nav2d)/matlab/mprim/floribot_minturnradius04_fwrd1_bwrd4_fturn2_bturn8_turn10.mprim" />
+	  	<param name="SBPLLatticePlanner/primitive_filename" value="$(find nav2d)/matlab/mprim/floribot_minturnradius0383_fwrd1_bwrd1_fturn2_bturn2_turn3.mprim" />
 
 		<rosparam file="$(find nav2d)/param/common_costmap_params.yaml" command="load" ns="global_costmap" />
 		<rosparam file="$(find nav2d)/param/common_costmap_params.yaml" command="load" ns="local_costmap" /> 
