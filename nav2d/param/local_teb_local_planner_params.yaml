@@ -26,7 +26,7 @@ TebLocalPlannerROS:
  
  # Robot         
  max_vel_x: 0.5 # Maximum translational velocity of the robot
- max_vel_x_backwards: 0.05 # Maximum translational velocity of the robot for driving backwards
+ max_vel_x_backwards: 0.5 # Maximum translational velocity of the robot for driving backwards
  max_vel_theta: 0.5 # Maximum angular velocity of the robot
  acc_lim_x: 1.0 # Maximum translational acceleration of the robot
  acc_lim_theta: 1.0 # Maximum angular acceleration of the robot
