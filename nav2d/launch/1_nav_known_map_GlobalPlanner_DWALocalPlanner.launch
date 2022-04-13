@@ -1,6 +1,6 @@
 <launch>
 	<master auto="start"/>
-	<arg name="map_name" default="playground"/>	
+	<arg name="map_name" default="new_map"/>	
 
 	<!-- Call the reset_odom service of base node when starting navigation stack to start with zero odometry-->
 	<node pkg="rosservice" type="rosservice" name="rosservice" args="call /reset_odom"/>
