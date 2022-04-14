@@ -25,7 +25,7 @@ TebLocalPlannerROS:
  via_points_ordered: False # If true, the planner adheres to the order of via-points in the storage container
  
  # Robot         
- max_vel_x: 0.5 # Maximum translational velocity of the robot
+ max_vel_x: 0.15 # Maximum translational velocity of the robot
  max_vel_x_backwards: 0.05 # Maximum translational velocity of the robot for driving backwards
  max_vel_theta: 0.5 # Maximum angular velocity of the robot
  acc_lim_x: 1.0 # Maximum translational acceleration of the robot
