@@ -26,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -116,6 +116,8 @@ Visualization Manager:
           Value: true
         map:
           Value: true
+        nav_base:
+          Value: true
         odom:
           Value: true
       Marker Alpha: 1
@@ -136,6 +138,8 @@ Visualization Manager:
                         {}
                 laserFront:
                   {}
+                nav_base:
+                  {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -150,7 +154,7 @@ Visualization Manager:
       Color: 138; 226; 52
       Color Transformer: FlatColor
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -165,7 +169,7 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Class: rviz/Group
       Displays:
         - Alpha: 0.699999988079071
@@ -296,7 +300,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 14.107237815856934
+      Distance: 10.01408863067627
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -304,17 +308,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.647436499595642
-        Y: 4.4918365478515625
-        Z: -0.06962518393993378
+        X: -2.972996950149536
+        Y: -2.5616886615753174
+        Z: -0.4357154667377472
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.2097970247268677
+      Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 2.5472238063812256
+      Yaw: 3.587226152420044
     Saved: ~
 Window Geometry:
   Displays:
