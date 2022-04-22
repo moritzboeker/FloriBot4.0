@@ -4,6 +4,7 @@ import math
 import rospy
 import tf2_ros
 import os.path 
+from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path, OccupancyGrid
 from actionlib_msgs.msg import GoalStatusArray
 import numpy as np
@@ -61,15 +62,18 @@ class PlotNavigation():
         return yaw
 
     def global_path_cb(self, global_path_msg):
-        # Sometimes, several global paths are determined consecutively, 
-        # while the robot is approaching the goal.
-        # But we want to plot only the first global path.
-        if not self.global_path_available:
-            for pose_stamped in global_path_msg.poses:
-                self.global_path_x.append(pose_stamped.pose.position.x)
-                self.global_path_y.append(pose_stamped.pose.position.y)
-                self.global_path_yaw.append(self.get_quaternion_yaw(pose_stamped.pose.orientation))
-            self.global_path_available = True
+        # each new global path is stored in a list
+        temp_x = []
+        temp_y = []
+        temp_yaw = []
+        for pose_stamped in global_path_msg.poses:
+            temp_x.append(pose_stamped.pose.position.x)
+            temp_y.append(pose_stamped.pose.position.y)
+            temp_yaw.append(self.get_quaternion_yaw(pose_stamped.pose.orientation))
+        self.global_path_x.append(temp_x)
+        self.global_path_y.append(temp_y)
+        self.global_path_yaw.append(temp_yaw)
+        self.global_path_available = True
         
     def occ_grid_cb(self, occ_grid_msg):
         self.map_width_px = occ_grid_msg.info.width
@@ -106,14 +110,17 @@ class PlotNavigation():
 
     def plot_global_path(self):
         if self.global_path_available:
-            self.ax_plot.plot(self.global_path_x, self.global_path_y, '-b', label="initial global path", linewidth=1)
-            self.ax_plot.plot(self.global_path_x[0], self.global_path_y[0], 'or', markersize=6, label="start global path (front carriage)", linewidth=1)
-            self.ax_plot.plot(self.global_path_x[-1], self.global_path_y[-1], 'xg', markersize=6, label="goal global path (front carriage)", linewidth=1)
-            pose_global_goal_f = [self.global_path_x[-1], self.global_path_y[-1], math.cos(self.global_path_yaw[-1]), math.sin(self.global_path_yaw[-1])] 
-            # pose_global_start_f = [self.global_path_x[0], self.global_path_y[0], math.cos(self.global_path_yaw[0]), math.sin(self.global_path_yaw[0])] 
-            self.ax_plot.quiver(pose_global_goal_f[0], pose_global_goal_f[1], pose_global_goal_f[2], pose_global_goal_f[3], width=0.003, headwidth=6, color='b')
-            # self.ax.quiver(pose_global_start_f[0], pose_global_start_f[1], pose_global_start_f[2], pose_global_start_f[3], width=0.003, headwidth=6, color='b')
-            self.ax_plot.add_patch(Circle([self.global_path_x[-1], self.global_path_y[-1]], self.xy_goal_tol, fc='none', ec='g', ls='--', label="goal tolerance"))
+            index = 0
+            for gp_x, gp_y, gp_yaw in zip(self.global_path_x, self.global_path_y, self.global_path_yaw):
+                self.ax_plot.plot(gp_x, gp_y, '-b', label="global path", linewidth=1)
+                self.ax_plot.plot(gp_x[0], gp_y[0], 'or', markersize=6, label="start global path (front carriage)", linewidth=1)
+                self.ax_plot.plot(gp_x[-1], gp_y[-1], 'xg', markersize=6, label="goal global path (front carriage)", linewidth=1)
+                pose_global_goal_f = [gp_x[-1], gp_y[-1], math.cos(gp_yaw[-1]), math.sin(gp_yaw[-1])] 
+                # pose_global_start_f = [gp_x[0], gp_y[0], math.cos(gp_yaw[0]), math.sin(gp_yaw[0])] 
+                self.ax_plot.quiver(pose_global_goal_f[0], pose_global_goal_f[1], pose_global_goal_f[2], pose_global_goal_f[3], width=0.003, headwidth=6, color='b')
+                # self.ax.quiver(pose_global_start_f[0], pose_global_start_f[1], pose_global_start_f[2], pose_global_start_f[3], width=0.003, headwidth=6, color='b')
+                self.ax_plot.add_patch(Circle([gp_x[-1], gp_y[-1]], self.xy_goal_tol, fc='none', ec='g', ls='--', label="goal tolerance"))
+                index += 1
 
     def plot_robot_pose(self):
         if self.robot_pose_available:
@@ -165,10 +172,10 @@ class PlotNavigation():
 
     def plot_goal_deviation(self):
         if self.global_path_available and self.robot_pose_available:
-            goal_pos = np.array((self.global_path_x[-1], self.global_path_y[-1]))
+            goal_pos = np.array((self.global_path_x[-1][-1], self.global_path_y[-1][-1]))
             robot_pos = np.array((self.robot_front_x[-1], self.robot_front_y[-1]))
             dist_diff = np.linalg.norm((goal_pos-robot_pos))
-            rot_diff = np.abs(self.global_path_yaw[-1] - self.robot_front_yaw[-1])
+            rot_diff = np.abs(self.global_path_yaw[-1][-1] - self.robot_front_yaw[-1])
             self.ax_plot.text(0.95, 0.01, "goal deviation: linear {:.2f} m, angular {:.2f} deg".format(dist_diff, np.degrees(rot_diff)),
                 verticalalignment='bottom', horizontalalignment='right',
                 transform=self.ax_plot.transAxes, color='black', fontsize=10)
