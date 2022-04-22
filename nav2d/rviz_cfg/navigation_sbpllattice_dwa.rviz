@@ -26,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -150,7 +150,7 @@ Visualization Manager:
       Color: 138; 226; 52
       Color Transformer: FlatColor
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -165,7 +165,7 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Class: rviz/Group
       Displays:
         - Alpha: 0.699999988079071
@@ -296,7 +296,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 14.107237815856934
+      Distance: 23.460369110107422
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -304,17 +304,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.647436499595642
-        Y: 4.4918365478515625
-        Z: -0.06962518393993378
+        X: 4.378142356872559
+        Y: -3.818579912185669
+        Z: -0.1714661419391632
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.2097970247268677
+      Pitch: 1.5397963523864746
       Target Frame: <Fixed Frame>
-      Yaw: 2.5472238063812256
+      Yaw: 3.1322200298309326
     Saved: ~
 Window Geometry:
   Displays:
