@@ -13,3 +13,6 @@
 [submodule "navigation"]
 	path = navigation
 	url = https://github.com/ros-planning/navigation.git
+[submodule "navigation_experimental"]
+	path = navigation_experimental
+	url = https://github.com/ros-planning/navigation_experimental.git
